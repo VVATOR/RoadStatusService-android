@@ -3,12 +3,13 @@
 buildscript {
     
     repositories {
+        mavenLocal()
         google()
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        
+
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -17,6 +18,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         google()
         jcenter()
     }
@@ -25,3 +27,8 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+dependencies{
+    'by.gsu:RoadStatusService-dto:1.0'
+    'by.gsu:RoadStatusService-client:1.0'
+}
+
