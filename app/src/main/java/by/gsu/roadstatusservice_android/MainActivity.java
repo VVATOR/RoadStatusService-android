@@ -1,16 +1,17 @@
 package by.gsu.roadstatusservice_android;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,10 +19,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.IOException;
 
 import by.gsu.RoadStatusService.models.Picture;
 import by.gsu.client.Client;
@@ -30,9 +30,28 @@ import by.gsu.client.Client;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final boolean TODO = true;
+    LocationManager lm;
+    Location location;
+    double latitude = 0, longitude = 0;
+    TextView helloTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,6 +73,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        helloTextView = (TextView) findViewById(R.id.picTextView);
+        helloTextView.setText("000");
     }
 
     @Override
@@ -96,7 +117,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            iv=(ImageView)findViewById(R.id.newImageView);
+            iv = (ImageView) findViewById(R.id.newImageView);
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(intent, 0);
 
@@ -115,7 +136,9 @@ public class MainActivity extends AppCompatActivity
 
             Picture p = new Picture();
             Client client = new Client();
-            TextView ptv =(TextView) findViewById(R.id.picTextView);
+
+
+            /*TextView ptv =(TextView) findViewById(R.id.picTextView);
             try {
                 p = client.methodGetPicture(5);
                 ptv.setText(p.toString());
@@ -123,8 +146,9 @@ public class MainActivity extends AppCompatActivity
               //  e.printStackTrace();
                 ptv.setText(e.getMessage());
             }
-
-
+*/
+            p.setId(11);
+            helloTextView.setText("lolaaaaa");
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             startActivity(intent);
@@ -134,8 +158,30 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
+            helloTextView.setText("lolaaaaa");
         } else if (id == R.id.nav_send) {
+            LocationManager enabledManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            if (enabledManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return TODO;
+                }
+                location = enabledManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location == null) {
+                    //Location wasnt gathered
+                } else {
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                }
+            }
 
+            helloTextView.setText("latitude=" + latitude + "; longitude=" + longitude);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
