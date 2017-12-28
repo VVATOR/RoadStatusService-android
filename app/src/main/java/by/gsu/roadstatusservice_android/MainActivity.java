@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -23,12 +24,27 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import by.gsu.RoadStatusService.models.Picture;
 import by.gsu.client.Client;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Client client = new Client();
 
     private static final boolean TODO = true;
     LocationManager lm;
@@ -39,6 +55,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -134,8 +152,8 @@ public class MainActivity extends AppCompatActivity
                 //lm.requestLocationUpdatesLocationManager.GPS_PROVIDER, 0, 0, intent);
             }*/
 
-            Picture p = new Picture();
-            Client client = new Client();
+            // Picture p = new Picture();
+            // Client client = new Client();
 
 
             /*TextView ptv =(TextView) findViewById(R.id.picTextView);
@@ -147,18 +165,93 @@ public class MainActivity extends AppCompatActivity
                 ptv.setText(e.getMessage());
             }
 */
-            p.setId(11);
-            helloTextView.setText("lolaaaaa");
+            // p.setId(11);
+           /* try {
+                helloTextView.setText("lolaaaaa"+p.toString()+client.methodGetPicture(4));
+            } catch (IOException e) {
+                helloTextView.setText(e.getMessage());
+            }
+*/
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
+         /*   HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL("https://road-status-service-impl.herokuapp.com/picture/1");
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                byte[] buffer = new byte[1024];
+                in.read(buffer);
+                helloTextView.setText(new String(buffer));
+            } catch (MalformedURLException e) {
+                helloTextView.setText(e.getMessage());
+            } catch (IOException e) {
+                helloTextView.setText(e.getMessage());
+            } finally {
+                urlConnection.disconnect();
+            }*/
+
+            helloTextView.setText("aaa "+client.methodGetListPicturesString());
 
         } else if (id == R.id.nav_manage) {
+            Picture p = new Picture();
 
+            try {
+                helloTextView.setText(client.methodGetPicture(4).toString());
+            } catch (IOException e) {
+                helloTextView.setText(e.getMessage());
+            }
         } else if (id == R.id.nav_share) {
+            helloTextView.setText("1010101010");
+            StringBuilder returnString = new StringBuilder();
+            returnString.append("xxx");
+            URL url = null; // URL for request
+            try {
+                url = new URL("https://road-status-service-impl.herokuapp.com/picture/1");
+            } catch (MalformedURLException e) {
+                returnString.append("1" + e.getMessage());
+            }
+            String sParameters = ""; // POST data
+            HttpsURLConnection urlConnection = null;
+            BufferedReader input = null;
 
-            helloTextView.setText("lolaaaaa");
+
+            try {
+                urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+               /* urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                urlConnection.setRequestProperty("Content-Length",sParameters != null ? ("" + Integer.toString(sParameters.getBytes().length)) : "0");
+                urlConnection.setRequestProperty("Content-Language", "en-US");
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setUseCaches(false);
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(sParameters != null);*/
+
+                // Send request
+                /*if(sParameters != null) {
+                    DataOutputStream output = new DataOutputStream(urlConnection.getOutputStream());
+                    output.writeBytes(sParameters);
+                    output.flush();
+                    output.close();
+                }*/
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"), 8);
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    returnString.append(line);
+                }
+            } catch (Exception e) {
+                returnString.append("2" + e.getMessage());
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+
+
+            helloTextView.setText(returnString.toString());
         } else if (id == R.id.nav_send) {
             LocationManager enabledManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             if (enabledManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -190,6 +283,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private ImageView iv;
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
