@@ -39,6 +39,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import by.gsu.RoadStatusService.models.Picture;
 import by.gsu.client.Client;
+import by.gsu.roadstatusservice_android.lazylist.ListActivity;
 
 
 public class MainActivity extends AppCompatActivity
@@ -132,8 +133,11 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (id == R.id.listCustom) {
+            Intent intent = new Intent(MainActivity.this, ListActivity.class);
+            startActivity(intent);
 
-        if (id == R.id.nav_camera) {
+        } else if (id == R.id.nav_camera) {
             // Handle the camera action
             iv = (ImageView) findViewById(R.id.newImageView);
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -193,7 +197,11 @@ public class MainActivity extends AppCompatActivity
                 urlConnection.disconnect();
             }*/
 
-            helloTextView.setText("aaa "+client.methodGetListPicturesString());
+            try {
+                helloTextView.setText("aaa " + client.getListPictures());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         } else if (id == R.id.nav_manage) {
             Picture p = new Picture();
