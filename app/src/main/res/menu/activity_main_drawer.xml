@@ -8,6 +8,10 @@
             android:id="@+id/listCustom"
             android:title="listCustom" />
         <item
+            android:id="@+id/base64_picture"
+            android:checkable="false"
+            android:title="base64_picture" />
+        <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
             android:title="Make photo" />
@@ -35,10 +39,6 @@
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Send" />
-            <item
-                android:id="@+id/base64_picture"
-                android:checkable="false"
-                android:title="base64_picture" />
             <item
                 android:id="@+id/list"
                 android:title="list" />
