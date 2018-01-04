@@ -1,20 +1,16 @@
 package by.gsu.roadstatusservice_android;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,35 +23,36 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import by.gsu.RoadStatusService.models.Picture;
+import by.gsu.RoadStatusService.models.Point;
 import by.gsu.client.Client;
+import by.gsu.roadstatusservice_android.exceptions.LocationException;
 import by.gsu.roadstatusservice_android.lazylist.ListActivity;
+import by.gsu.roadstatusservice_android.utils.LocationUtils;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Client client = new Client();
+    private LocationUtils locationUtils = new LocationUtils(this);
 
     private static final boolean TODO = true;
     LocationManager lm;
-    Location location;
+    private Location location;
+    private ImageView iv;
     double latitude = 0, longitude = 0;
     TextView helloTextView;
-
+    private String locationInfo = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +65,23 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        helloTextView = (TextView) findViewById(R.id.picTextView);
+        iv = (ImageView) findViewById(R.id.newImageView);
+
+        try {
+            location = locationUtils.getLocation();
+            locationInfo = ("Latitude:" + location.getLatitude() + "; Latitude:" + location.getLatitude() + ";");
+        } catch (LocationException e) {
+            locationInfo = (e.getMessage());
+        }
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, locationInfo, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -86,8 +95,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        helloTextView = (TextView) findViewById(R.id.picTextView);
-        helloTextView.setText("000");
     }
 
     @Override
@@ -156,9 +163,26 @@ public class MainActivity extends AppCompatActivity
             //}
         } else if (id == R.id.nav_camera) {
             // Handle the camera action
-            iv = (ImageView) findViewById(R.id.newImageView);
+
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(intent, 0);
+
+
+            helloTextView.setText("ssssssssssssssssss");
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
+
+            Bitmap bitmap1 = drawable.getBitmap();
+            bitmap1.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+
+            Point point = new Point(location.getLatitude(), location.getLongitude());
+            Picture newPicture = new Picture(331, "name", "description", point, encoded);
+
+            client.methodPostPicture(newPicture);
 
 
         } else if (id == R.id.nav_map) {
@@ -238,13 +262,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private ImageView iv;
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
-
-        Bitmap bp = (Bitmap) data.getExtras().get("data");
-        iv.setImageBitmap(bp);
+        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+        iv.setImageBitmap(bitmap);
     }
 }
