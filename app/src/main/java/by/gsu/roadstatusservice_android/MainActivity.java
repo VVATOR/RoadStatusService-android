@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -55,24 +56,14 @@ public class MainActivity extends AppCompatActivity
     double latitude = 0, longitude = 0;
     TextView helloTextView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,6 +85,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         helloTextView = (TextView) findViewById(R.id.picTextView);
         helloTextView.setText("000");
     }
@@ -135,11 +127,15 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.listCustom) {
+        if (id == R.id.nav_listCustom) {
             Intent intent = new Intent(MainActivity.this, ListActivity.class);
             startActivity(intent);
 
-        } else if(id == R.id.base64_picture){
+        } else if (id == R.id.nav_location) {
+            Intent intent = new Intent(MainActivity.this, LocationActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_base64_picture) {
             Picture p = new Picture();
             p.setId(11);
             p.setName("pict");
@@ -158,46 +154,14 @@ public class MainActivity extends AppCompatActivity
             //} catch (IOException e) {
             //    helloTextView.setText(e.getMessage());
             //}
-    }else if (id == R.id.nav_camera) {
+        } else if (id == R.id.nav_camera) {
             // Handle the camera action
             iv = (ImageView) findViewById(R.id.newImageView);
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(intent, 0);
 
-           /* LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-            if (lm != null) {
-                Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location == null) {
-                    location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-                if (location != null) {
-                    update(location.getLatitude(), location.getLongitude());
-                }
 
-                //lm.requestLocationUpdatesLocationManager.GPS_PROVIDER, 0, 0, intent);
-            }*/
-
-            // Picture p = new Picture();
-            // Client client = new Client();
-
-
-            /*TextView ptv =(TextView) findViewById(R.id.picTextView);
-            try {
-                p = client.methodGetPicture(5);
-                ptv.setText(p.toString());
-            } catch (IOException e) {
-              //  e.printStackTrace();
-                ptv.setText(e.getMessage());
-            }
-*/
-            // p.setId(11);
-           /* try {
-                helloTextView.setText("lolaaaaa"+p.toString()+client.methodGetPicture(4));
-            } catch (IOException e) {
-                helloTextView.setText(e.getMessage());
-            }
-*/
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_map) {
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
@@ -250,21 +214,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-               /* urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                urlConnection.setRequestProperty("Content-Length",sParameters != null ? ("" + Integer.toString(sParameters.getBytes().length)) : "0");
-                urlConnection.setRequestProperty("Content-Language", "en-US");
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(sParameters != null);*/
 
-                // Send request
-                /*if(sParameters != null) {
-                    DataOutputStream output = new DataOutputStream(urlConnection.getOutputStream());
-                    output.writeBytes(sParameters);
-                    output.flush();
-                    output.close();
-                }*/
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"), 8);
                 String line = null;
@@ -281,29 +231,6 @@ public class MainActivity extends AppCompatActivity
 
 
             helloTextView.setText(returnString.toString());
-        } else if (id == R.id.nav_send) {
-            LocationManager enabledManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            if (enabledManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return TODO;
-                }
-                location = enabledManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location == null) {
-                    //Location wasnt gathered
-                } else {
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                }
-            }
-
-            helloTextView.setText("latitude=" + latitude + "; longitude=" + longitude);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

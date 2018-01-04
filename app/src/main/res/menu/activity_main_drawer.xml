@@ -5,43 +5,43 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/listCustom"
-            android:title="listCustom" />
+            android:id="@+id/nav_location"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/location" />
         <item
-            android:id="@+id/base64_picture"
+            android:id="@+id/nav_listCustom"
+            android:title="@string/listcustom" />
+        <item
+            android:id="@+id/nav_base64_picture"
             android:checkable="false"
-            android:title="base64_picture" />
+            android:title="@string/base64_picture" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/map" />
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Make photo" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="@string/make_photo" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="@string/slideshow" />
         <item
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_menu_share"
-            android:title="Share" />
+            android:title="@string/share" />
     </group>
 
-    <item android:title="Configuration">
+    <item android:title="@string/configuration">
         <menu>
             <item
                 android:id="@+id/nav_manage"
                 android:icon="@drawable/ic_menu_manage"
-                android:title="manage" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="@string/manage" />
             <item
                 android:id="@+id/list"
-                android:title="list" />
+                android:title="@string/list" />
         </menu>
     </item>
 

@@ -9,16 +9,25 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import by.gsu.RoadStatusService.models.Picture;
+import by.gsu.RoadStatusService.models.Point;
 import by.gsu.roadstatusservice_android.R;
 
 public class LazyAdapter extends BaseAdapter {
     
     private Activity activity;
-    private String[] data;
+    //private String[] data;
+
+    private List<Picture> data = new ArrayList<Picture>() ;
+
+
     private static LayoutInflater inflater=null;
     public ImageLoader imageLoader; 
     
-    public LazyAdapter(Activity a, String[] d) {
+    public LazyAdapter(Activity a, List<Picture> d) {
         activity = a;
         data=d;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -26,7 +35,7 @@ public class LazyAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return data.length;
+        return data.size();
     }
 
     public Object getItem(int position) {
@@ -44,8 +53,10 @@ public class LazyAdapter extends BaseAdapter {
 
         TextView text=(TextView)vi.findViewById(R.id.text);;
         ImageView image=(ImageView)vi.findViewById(R.id.image);
-        text.setText("custom_list_item "+position);
-        imageLoader.DisplayImage(data[position], image);
+        Picture picture = data.get(position);
+        text.setText("item: "+picture.getName());
+
+        imageLoader.DisplayImage(picture.getData(), image);
         return vi;
     }
 }
