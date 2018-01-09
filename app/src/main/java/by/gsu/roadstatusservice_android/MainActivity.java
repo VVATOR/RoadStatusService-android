@@ -29,12 +29,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import by.gsu.RoadStatusService.models.Picture;
 import by.gsu.RoadStatusService.models.Point;
 import by.gsu.client.Client;
+import by.gsu.client.ClientInMemory;
+import by.gsu.client.IRoadStatusClient;
 import by.gsu.roadstatusservice_android.exceptions.LocationException;
 import by.gsu.roadstatusservice_android.lazylist.ListActivity;
 import by.gsu.roadstatusservice_android.utils.LocationUtils;
@@ -43,7 +47,7 @@ import by.gsu.roadstatusservice_android.utils.LocationUtils;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Client client = new Client();
+    private IRoadStatusClient client = new ClientInMemory();
     private LocationUtils locationUtils = new LocationUtils(this);
 
     private static final boolean TODO = true;
@@ -163,10 +167,9 @@ public class MainActivity extends AppCompatActivity
             //}
         } else if (id == R.id.nav_camera) {
             // Handle the camera action
-
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            //intent.putExtra("list", client);
             startActivityForResult(intent, 0);
-
 
             helloTextView.setText("ssssssssssssssssss");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity
 
 
             Point point = new Point(location.getLatitude(), location.getLongitude());
-            Picture newPicture = new Picture(331, "name", "description", point, encoded);
+            Picture newPicture = new Picture(331, System.currentTimeMillis() +".jpg", "description", point, encoded);
 
             client.methodPostPicture(newPicture);
 
